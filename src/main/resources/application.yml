@@ -1,0 +1,87 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"  #暴露所有的端点我们可以看到更多的服务实例相关信息
+  endpoint:
+    health:
+      show-details: always #health endpoint是否必须显示全部细节
+#动态刷新配置 ---需要忽略权限拦截
+security:
+  enabled: true
+info:
+  name: ${spring.application.name}
+spring:
+  application:
+    name: jackieonway-activiti-manager
+  activiti:
+    check-process-definitions: false
+    process-definition-location-prefix: classpath:/processes/
+    # check-process-definitions: false  #这个比较重要，不配置的话会扫描类路径下的processes下的.xml文件
+    job-executor-activate: false  # 是否开启定时任务： false：不开启，默认值
+  jackson:
+    #字符串时间，用这行表示
+    date-format: yyyy-MM-dd HH:mm:ss
+    #设置为东八区时间
+    timezone: GMT+8
+    #使用数值timestamp表示日期,#想要值为2019-01-01改为true
+    write-dates-as-timestamps: true
+  profiles:
+    active: dev
+server:
+  port: 9001
+  undertow:
+    # 设置IO线程数, 它主要执行非阻塞的任务,它们会负责多个连接, 默认设置每个CPU核心一个线程
+    io-threads: 16
+    # 阻塞任务线程池, 当执行类似servlet请求阻塞操作, undertow会从这个线程池中取得线程,它的值设置取决于系统的负载
+    worker-threads: 128
+    # 以下的配置会影响buffer,这些buffer会用于服务器连接的IO操作,有点类似netty的池化内存管理
+    # 每块buffer的空间大小,越小的空间被利用越充分
+    buffer-size: 1024
+    # 是否分配的直接内存
+    direct-buffers: true
+  servlet:
+    # 应用的访问路径
+#    context-path: /activiti
+    tomcat:
+      # tomcat的URI编码
+      uri-encoding: UTF-8
+      # tomcat最大线程数，默认为200
+      max-threads: 800
+      # Tomcat启动初始化的线程数，默认值25
+      min-spare-threads: 30
+      #链接建立超时时间
+      connection-timeout: 8000
+
+      max-http-post-size: 20971520
+
+
+# 防止XSS攻击
+xss:
+  # 过滤开关
+  enabled: true
+  # 排除链接（多个用逗号分隔）
+  excludes: /system/notice/*
+  # 匹配链接
+  urlPatterns: /system/*,/monitor/*,/tool/*
+
+
+#mybaits-plus
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
+  #实体扫描
+  typeAliasesPackage:  com.gsww.activiti.entity
+  global-config:
+    #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+    id-type: 3
+    field-strategy: 1
+    db-column-underline: true
+    refresh-mapper: true
+    logic-delete-value: 1  #配置逻辑删除字段为1是删除
+    logic-not-delete-value: 0 #配置逻辑删除字段为101001是未删除
+    sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector #逻辑删除配置
+  configuration:
+    #配置返回数据库(column下划线命名&&返回java实体是驼峰命名)，自动匹配无需as（没开启这个，SQL需要写as： select user_id as userId）
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql语句,调试用
