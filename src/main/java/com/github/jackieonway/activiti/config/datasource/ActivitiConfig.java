@@ -12,19 +12,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import java.io.IOException;
 
-@Configuration//声名为配置类，继承Activiti抽象配置类
+//声名为配置类，继承Activiti抽象配置类
+@Configuration
 public class ActivitiConfig extends AbstractProcessEngineAutoConfiguration {
 
     @Bean
     @Primary
-    @ConfigurationProperties(prefix = "spring.master.datasource")
-    public DruidDataSource masterDataSource() {
-        return new DruidDataSource();
-    }
-
-    @Bean
-    @ConfigurationProperties(prefix = "spring.activiti-db.datasource")
-    public DruidDataSource activitiDataSource() {
+    @ConfigurationProperties(prefix = "spring.datasource")
+    public DruidDataSource druidDataSource() {
         return new DruidDataSource();
     }
 
@@ -34,7 +29,7 @@ public class ActivitiConfig extends AbstractProcessEngineAutoConfiguration {
             SpringAsyncExecutor springAsyncExecutor) throws IOException {
 
         return baseSpringProcessEngineConfiguration(
-                activitiDataSource(),
+                druidDataSource(),
                 transactionManager,
                 springAsyncExecutor);
     }
