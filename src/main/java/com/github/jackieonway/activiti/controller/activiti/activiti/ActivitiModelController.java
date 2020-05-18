@@ -5,6 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jackieonway.activiti.utils.ResponseUtils;
 import com.github.jackieonway.activiti.utils.ResultMsg;
+import com.github.jackieonway.activiti.utils.page.PageResult;
+import com.github.jackieonway.activiti.utils.page.QueryConditionBean;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.constants.ModelDataJsonConstants;
@@ -12,8 +18,6 @@ import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -29,16 +33,19 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
+@Api(value = "工作流模型相关接口", tags = "工作流模型相关接口")
 public class ActivitiModelController {
-    private static final Logger log = LoggerFactory.getLogger(ActivitiModelController.class);
+
     @Autowired
     ObjectMapper objectMapper;
+
     @Autowired
     private RepositoryService repositoryService;
 
     /**
      * 新建一个空模型
      */
+    @ApiOperation(value = "新建一个空模型")
     @GetMapping("/create")
     public void newModel(HttpServletResponse response) throws IOException {
         //初始化一个空模型
@@ -71,16 +78,29 @@ public class ActivitiModelController {
     /**
      * 获取所有模型
      */
+    @ApiOperation(value = "获取所有模型", notes = "必传参数: queryConditionBean: 分页")
     @GetMapping("/modelList")
     @ResponseBody
-    public List<Model> modelList() {
-        return repositoryService.createModelQuery().list();
+    public PageResult<Model> modelList(QueryConditionBean queryConditionBean) {
+        PageResult<Model> pageResult =
+                PageResult.newEmptyResult(queryConditionBean.getPageNum(), queryConditionBean.getPageSize());
+        List<Model> models = repositoryService.createModelQuery().listPage(queryConditionBean.getStartIndex(),
+                queryConditionBean.getPageSize());
+        if (CollectionUtils.isEmpty(models)){
+            return pageResult;
+        }
+        pageResult.setTotalCount(repositoryService.createModelQuery().count());
+        pageResult.setList(models);
+        return pageResult;
     }
 
     /**
-     * 发布模型为流程定义
+     * 根据模型id发布模型为流程定义
      * http://localhost:8080/deploy?modelId=1
      */
+    @ApiOperation(value = "根据模型id发布模型为流程定义", notes = "必传参数: modelId: 模型id")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "modelId", paramType = "query", value = "模型id", required = true, dataType = "String")})
     @GetMapping("/deploy")
     @ResponseBody
     public ResultMsg deploy(String modelId) throws IOException {
