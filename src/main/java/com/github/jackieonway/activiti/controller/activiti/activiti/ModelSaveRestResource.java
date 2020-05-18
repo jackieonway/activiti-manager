@@ -15,6 +15,10 @@ package com.github.jackieonway.activiti.controller.activiti.activiti;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.constants.ModelDataJsonConstants;
@@ -42,6 +46,7 @@ import java.nio.charset.StandardCharsets;
 @CrossOrigin
 @RestController
 @RequestMapping("/service")
+@Api(value = "工作流模型保存接口", tags = "工作流模型保存接口")
 public class ModelSaveRestResource implements ModelDataJsonConstants {
     private Logger LOGGER = LoggerFactory.getLogger(ModelSaveRestResource.class);
 
@@ -54,6 +59,15 @@ public class ModelSaveRestResource implements ModelDataJsonConstants {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @ApiOperation(value = "保存模型", notes = "必传参数: modelId: 模型id, json_xml: 流程XML的JSON形式数据, " +
+            "svg_xml:流程XML的SVG形式数据, description: 工作流模型描述, name： 工作流模型名称")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "modelId", paramType = "query", value = "模型id", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "json_xml", paramType = "query", value = "流程XML的JSON形式数据", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "svg_xml", paramType = "query", value = "流程XML的SVG形式数据", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "description", paramType = "query", value = "工作流模型描述", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "name", paramType = "query", value = "工作流模型名称", required = true, dataType = "String"),
+    })
     @PutMapping(value = "/model/{modelId}/save")
     @ResponseStatus(value = HttpStatus.OK)
     public void saveModel(@PathVariable String modelId, @RequestParam("name") String name,

@@ -14,6 +14,10 @@ package com.github.jackieonway.activiti.controller.activiti.activiti;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.RepositoryService;
@@ -33,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 @CrossOrigin
 @RestController
 @RequestMapping("/service")
+@Api(value = "工作流模型编辑接口", tags = "工作流模型编辑接口")
 public class ModelEditorJsonRestResource implements ModelDataJsonConstants {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModelEditorJsonRestResource.class);
@@ -44,6 +49,9 @@ public class ModelEditorJsonRestResource implements ModelDataJsonConstants {
     private ObjectMapper objectMapper;
 
     @GetMapping(value = "/model/{modelId}/json", produces = "application/json")
+    @ApiOperation(value = "根据模型id获取流程模型数据", notes = "必传参数: modelId: 模型id")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "modelId", paramType = "query", value = "模型id", required = true, dataType = "String")})
     public ObjectNode getEditorJson(@PathVariable String modelId) {
         ObjectNode modelNode = null;
 
