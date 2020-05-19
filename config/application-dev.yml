@@ -1,0 +1,37 @@
+# 日志配置
+logging:
+  level:
+    com.github.jackieonway: debug
+    org.springframework: warn
+    org.apache.ibatis.logging.stdout.StdOutImpl: info
+    org.activiti.engine.impl.persistence.entity: trace
+# 数据源配置
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/jackieonway_activiti?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: root
+    password: 1234abcd
+    hikari:
+      pool-name: hikariCP-biz
+      auto-commit: false
+      read-only: false
+      maximum-pool-size: 20
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      idle-timeout: 600000
+  jackieonway:
+    swagger:
+      enable: true
+      api-info:
+        version: 1.0
+        title: "工作流服务接口信息"
+        description: "工作流服务Swagger接口信息"
+        terms-of-service-url: "http://${spring.cloud.client.ip-address}:${server.port}"
+        contact:
+          name: "jackieonway"
+          url: "https://github.com/jackieonway"
+activiti:
+  root:
+    path: D:\\activiti\\
