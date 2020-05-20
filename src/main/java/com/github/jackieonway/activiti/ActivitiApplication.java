@@ -6,13 +6,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class,
         org.activiti.spring.boot.SecurityAutoConfiguration.class, SecurityAutoConfiguration.class})
-@EnableDiscoveryClient
+//@EnableDiscoveryClient
 public class ActivitiApplication{
+    public static String[] args;
 
+    public static ConfigurableApplicationContext applicationContext;
     public static void main(String[] args) {
-        SpringApplication.run(ActivitiApplication.class, args);
+        ActivitiApplication.args = args;
+        ActivitiApplication.applicationContext = SpringApplication.run(ActivitiApplication.class, args);
     }
 }

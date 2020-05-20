@@ -12,7 +12,11 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import java.io.IOException;
 
-//声名为配置类，继承Activiti抽象配置类
+/**
+ * 声名为配置类，继承Activiti抽象配置类
+ * @author jackieonway
+ */
+
 @Configuration
 public class ActivitiConfig extends AbstractProcessEngineAutoConfiguration {
 
