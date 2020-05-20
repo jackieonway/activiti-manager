@@ -25,10 +25,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-
         <!--阿里数据库连接池 -->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -188,6 +187,9 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArguments>
+                        <bootclasspath>${env.JAVA_HOME}\jre\lib\rt.jar;</bootclasspath>
+                    </compilerArguments>
                 </configuration>
             </plugin>
             <plugin>

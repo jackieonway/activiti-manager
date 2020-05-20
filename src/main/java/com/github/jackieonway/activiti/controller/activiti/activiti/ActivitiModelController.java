@@ -141,7 +141,7 @@ public class ActivitiModelController {
         InputStreamReader in = null;
         try {
             String fileName = uploadfile.getOriginalFilename();
-            if (!(".bpmn20.xml".endsWith(fileName) || ".bpmn".endsWith(fileName))) {
+            if (!(fileName.endsWith(".bpmn20.xml") || fileName.endsWith(".bpmn"))) {
                 log.error("activiti import error , file name is [{}], but is not \".bpmn20.xml\" or \".bpmn\" : [{}]"
                         , fileName);
                 return;
