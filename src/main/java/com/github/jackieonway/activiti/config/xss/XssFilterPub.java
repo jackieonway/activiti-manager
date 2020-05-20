@@ -29,15 +29,16 @@ public class XssFilterPub implements Filter {
      */
     private static boolean checkqlInject(String str, String url) {
         if (StringUtils.isEmpty(str)) {
-            return false;// 如果传入空串则认为不存在非法字符
+            // 如果传入空串则认为不存在非法字符
+            return false;
         }
 
         // 判断黑名单
         String[] injStra = {"script", "truncate", "insert", "select", "delete", "declare", "update", "alter",
                 "iframe", "onreadystatechange", "alert", "atestu", "drop",
                 "confirm", "prompt", "onload", "eval", "onmouseover", "onfocus", "onerror", "document"};
-
-        str = str.toLowerCase(); // sql不区分大小写
+        // sql不区分大小写
+        str = str.toLowerCase();
 
         for (String s : injStra) {
             if (str.contains(s)) {
