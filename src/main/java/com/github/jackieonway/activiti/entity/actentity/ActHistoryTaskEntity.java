@@ -5,6 +5,7 @@
 package com.github.jackieonway.activiti.entity.actentity;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
  * @version $id: ActHistoryTaskEntity.java v 0.1 2020-02-25 11:37 Jackie Exp $$
  */
 @Data
+@Accessors(chain = true)
 public class ActHistoryTaskEntity {
 
     private String id;

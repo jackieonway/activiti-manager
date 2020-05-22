@@ -393,7 +393,6 @@ public class ActWorkFlowServiceImpl implements ActWorkFlowService {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId())
                 .taskTenantId(workFlowRequest.getTenant()).singleResult();
         setAssignee(workFlowRequest, task);
-//        setCandidateGroups(workFlowRequest, task);
         setCandidateUsers(workFlowRequest, task);
         return ResponseUtils.success();
     }
@@ -423,12 +422,6 @@ public class ActWorkFlowServiceImpl implements ActWorkFlowService {
         if (!users.contains(workFlowRequest.getAssignee())) {
             log.info("拾取任务失败,租户[{}]业务键[{}]没有候选人[{}]", workFlowRequest.getTenant(),
                     workFlowRequest.getBusinessKey(), workFlowRequest.getAssignee());
-            /*List<String> groupIds = dataList.stream().map(ActIdentityLinkEntity::getGroupId).collect(Collectors
-            .toList());
-            if (!groupIds.contains(workFlowRequest.getAssignee())) {
-                log.info("拾取任务失败,租户[{}]业务键[{}]没有候选组[{}]", workFlowRequest.getTenant(),
-                        workFlowRequest.getBusinessKey(), workFlowRequest.getAssignee());
-            }*/
             return ResponseUtils.fail(CLAIM_TASK_FAIL);
         }
 

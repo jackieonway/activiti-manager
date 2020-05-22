@@ -5,6 +5,7 @@
 package com.github.jackieonway.activiti.entity.actentity;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 
@@ -13,6 +14,7 @@ import java.util.Date;
  * @version $id: ActDeployment.java v 0.1 2020-04-09 11:27 Jackie Exp $$
  */
 @Data
+@Accessors(chain = true)
 public class ActDeployment {
     private String id;
     private String name;

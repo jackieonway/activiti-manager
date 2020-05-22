@@ -1,10 +1,15 @@
 package com.github.jackieonway.activiti.config.emum;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * resultCode枚举类
  *
  * @author :Jackieonway
  */
+@Getter
+@AllArgsConstructor
 public enum ResultStatusCode {
 
     /**
@@ -16,19 +21,7 @@ public enum ResultStatusCode {
      */
     ERROR(-1, "ERROR");
 
-    private int resultCode;
-    private String resultMsg;
+    private Integer code;
+    private String msg;
 
-    ResultStatusCode(int resultCode, String resultMsg) {
-        this.resultCode = resultCode;
-        this.resultMsg = resultMsg;
-    }
-
-    public int getResultCode() {
-        return resultCode;
-    }
-
-    public String getResultMsg() {
-        return resultMsg;
-    }
 }

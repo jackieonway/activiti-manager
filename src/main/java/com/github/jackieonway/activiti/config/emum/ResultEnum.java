@@ -1,11 +1,16 @@
 package com.github.jackieonway.activiti.config.emum;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * @program:
  * @description: 统一返回错误码，所有错误码必须在这个文档里面定义
  * @author: Jackieonway
  * @create: 2019-04-26 10:49
  **/
+@Getter
+@AllArgsConstructor
 public enum ResultEnum {
 
     /* 成功状态码 */
@@ -167,42 +172,7 @@ public enum ResultEnum {
 
     private Integer code;
 
-    private String message;
+    private String msg;
 
-    ResultEnum(Integer code, String message) {
-        this.code = code;
-        this.message = message;
-    }
-
-    public static String getMessage(String name) {
-        for (ResultEnum item : ResultEnum.values()) {
-            if (item.name().equals(name)) {
-                return item.message;
-            }
-        }
-        return name;
-    }
-
-    public static Integer getCode(String name) {
-        for (ResultEnum item : ResultEnum.values()) {
-            if (item.name().equals(name)) {
-                return item.code;
-            }
-        }
-        return null;
-    }
-
-    public Integer code() {
-        return this.code;
-    }
-
-    public String message() {
-        return this.message;
-    }
-
-    @Override
-    public String toString() {
-        return this.name();
-    }
 }
 

@@ -12,7 +12,7 @@ public class CommonUtil {
     }
 
     /**
-     * @Author deng1
+     * @Author jakcieonway
      * @Description 生成uuid
      * @Date 2019/11/25 下午 3:10
      **/

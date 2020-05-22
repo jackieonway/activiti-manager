@@ -4,6 +4,7 @@ import com.github.jackieonway.activiti.common.ValidatedGroup;
 import com.github.jackieonway.activiti.handler.ServiceException;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -15,6 +16,7 @@ import java.io.Serializable;
  * @author Jackieonway
  */
 @ApiModel("分页模型")
+@Data
 public class QueryConditionBean implements Serializable {
 
     private static final long serialVersionUID = -1155142000712944886L;
@@ -67,38 +69,6 @@ public class QueryConditionBean implements Serializable {
         if (pageNum * pageSize - totalCount > pageSize) {
             throw new ServiceException("pageNum值超出了查询页数限制");
         }
-    }
-
-    public Integer getPageNum() {
-        return pageNum;
-    }
-
-    public void setPageNum(Integer pageNum) {
-        this.pageNum = pageNum;
-    }
-
-    public Integer getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(Integer pageSize) {
-        this.pageSize = pageSize;
-    }
-
-    public String getOrderField() {
-        return orderField;
-    }
-
-    public void setOrderField(String orderField) {
-        this.orderField = orderField;
-    }
-
-    public String getOrderDirection() {
-        return orderDirection;
-    }
-
-    public void setOrderDirection(String orderDirection) {
-        this.orderDirection = orderDirection;
     }
 
     public Integer getStartIndex() {

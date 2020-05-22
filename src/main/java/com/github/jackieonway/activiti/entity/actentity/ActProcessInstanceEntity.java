@@ -5,6 +5,7 @@
 package com.github.jackieonway.activiti.entity.actentity;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 
@@ -13,6 +14,7 @@ import java.util.Date;
  * @version $id: ActProcessInstanceEntity.java v 0.1 2020-04-10 9:21 Jackie Exp $$
  */
 @Data
+@Accessors(chain = true)
 public class ActProcessInstanceEntity {
 
     private String id;

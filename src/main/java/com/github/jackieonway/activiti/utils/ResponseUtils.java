@@ -24,7 +24,7 @@ public class ResponseUtils<T> extends ResultMsg<T> {
      * @return message
      */
     public static <T> ResultMsg<T> success(T data) {
-        return defaultSuccessResponse().setResultData(data);
+        return defaultSuccessResponse().setData(data);
     }
 
     /**
@@ -42,7 +42,7 @@ public class ResponseUtils<T> extends ResultMsg<T> {
      * @return message
      */
     public static <T> ResultMsg<T> fail(String msg) {
-        return defaultErrorResponse().setResultMsg(msg);
+        return defaultErrorResponse().setData(msg);
     }
 
     /**
@@ -60,9 +60,7 @@ public class ResponseUtils<T> extends ResultMsg<T> {
      * @return message
      */
     public static <T> ResultMsg<T> validFail(String msg) {
-        ResultMsg resultMsg = validFailResponse();
-        resultMsg.setResultMsg(msg);
-        return resultMsg;
+        return validFailResponse().setMsg(msg);
     }
 
     /**
@@ -80,9 +78,7 @@ public class ResponseUtils<T> extends ResultMsg<T> {
      * @return message
      */
     public static <T> ResultMsg<T> fallback(String msg) {
-        ResultMsg resultMsg = defaultFallBack();
-        resultMsg.setResultMsg(msg);
-        return resultMsg;
+        return defaultFallBack().setMsg(msg);
     }
 
 }

@@ -36,19 +36,15 @@ public class PageResult<T> {
 
     public static <T> PageResult<T> newEmptyResult(Integer pageNum, Integer pageSize) {
         PageResult<T> result = new PageResult<>();
-        result.setTotalCount(0L);
-        result.setPageNum(pageNum);
-        result.setPageSize(pageSize);
-        result.setList(new ArrayList<>(1));
+        result.setTotalCount(0L).setPageNum(pageNum)
+            .setPageSize(pageSize).setList(new ArrayList<>(1));
         return result;
     }
 
     public static <T> PageResult<T> newEmptyResult(Pagination page) {
         PageResult<T> result = new PageResult<>();
-        result.setTotalCount(0L);
-        result.setPageNum(page.getCurrent());
-        result.setPageSize(page.getSize());
-        result.setList(new ArrayList<>(1));
+        result.setTotalCount(0L).setPageNum(page.getCurrent())
+                .setPageSize(page.getSize()).setList(new ArrayList<>(1));
         return result;
     }
 
@@ -65,10 +61,8 @@ public class PageResult<T> {
         if (null == page) {
             return result;
         }
-        result.setTotalCount((long) page.getTotal());
-        result.setPageSize(page.getSize());
-        result.setPageNum(page.getCurrent());
-        result.setList(dataList);
+        result.setTotalCount((long) page.getTotal()).setPageSize(page.getSize())
+                .setPageNum(page.getCurrent()).setList(dataList);
         if (CollectionUtils.isEmpty(dataList)) {
             result.setList(new ArrayList<>(1));
         }

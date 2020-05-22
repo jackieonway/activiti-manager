@@ -95,14 +95,6 @@ public class WorkFlowRequest {
     private List<String> candidateUsers;
 
     /**
-     * 候选组列表
-     */
-//    @ApiModelProperty("候选组列表")
-//    @NotBlank(message = "候选组列表不能为空", groups = ValidatedGroup.CandidateUsersGroup.class)
-//    private List<String> candidateGroups;
-
-
-    /**
      * 租户
      */
     @ApiModelProperty("租户")

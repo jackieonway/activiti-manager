@@ -29,44 +29,44 @@ public class ResultMsgUtils {
         if (Objects.isNull(resultMsg)) {
             return Collections.emptyList();
         }
-        if (ResultStatusCode.OK.getResultCode() != resultMsg.getResultCode()) {
-            log.info("getDataList 获取ResultData错误...,错误原因:[{}]", resultMsg.getResultMsg());
+        if (ResultStatusCode.OK.getCode().equals(resultMsg.getCode())) {
+            log.info("getDataList 获取ResultData错误...,错误原因:[{}]", resultMsg.getCode());
             return Collections.emptyList();
         }
-        if (CollectionUtils.isEmpty(resultMsg.getResultData())) {
+        if (CollectionUtils.isEmpty(resultMsg.getData())) {
             log.info("getDataList 获取ResultData为空...");
             return Collections.emptyList();
         }
-        return resultMsg.getResultData();
+        return resultMsg.getData();
     }
 
     public static <T> PageResult<T> getDataPageResult(ResultMsg<PageResult<T>> resultMsg, Pagination pagination) {
         if (Objects.isNull(resultMsg)) {
             return PageResult.newEmptyResult(pagination);
         }
-        if (ResultStatusCode.OK.getResultCode() != resultMsg.getResultCode()) {
-            log.info("getDataPageResult 获取ResultData错误...,错误原因:[{}]", resultMsg.getResultMsg());
+        if (ResultStatusCode.OK.getCode().equals(resultMsg.getCode())) {
+            log.info("getDataPageResult 获取ResultData错误...,错误原因:[{}]", resultMsg.getMsg());
             return PageResult.newEmptyResult(pagination);
         }
-        if (Objects.isNull(resultMsg.getResultData())) {
+        if (Objects.isNull(resultMsg.getData())) {
             log.info("getDataPageResult 获取ResultData为空...");
             return PageResult.newEmptyResult(pagination);
         }
-        return resultMsg.getResultData();
+        return resultMsg.getData();
     }
 
     public static <T, K> Map<T, K> getDataMap(ResultMsg<Map<T, K>> resultMsg) {
         if (Objects.isNull(resultMsg)) {
             return Collections.emptyMap();
         }
-        if (ResultStatusCode.OK.getResultCode() != resultMsg.getResultCode()) {
-            log.info("getDataMap 获取ResultData错误...,错误原因:[{}]", resultMsg.getResultMsg());
+        if (ResultStatusCode.OK.getCode().equals(resultMsg.getCode())) {
+            log.info("getDataMap 获取ResultData错误...,错误原因:[{}]", resultMsg.getMsg());
             return Collections.emptyMap();
         }
-        if (CollectionUtils.isEmpty(resultMsg.getResultData())) {
+        if (CollectionUtils.isEmpty(resultMsg.getData())) {
             log.info("getDataMap 获取ResultData为空...");
             return Collections.emptyMap();
         }
-        return resultMsg.getResultData();
+        return resultMsg.getData();
     }
 }
