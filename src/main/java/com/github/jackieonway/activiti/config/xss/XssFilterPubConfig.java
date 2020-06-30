@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Jackieonway
  */
-@Configuration
+//@Configuration
 public class XssFilterPubConfig {
     @Bean
     public FilterRegistrationBean filterRegistration() {

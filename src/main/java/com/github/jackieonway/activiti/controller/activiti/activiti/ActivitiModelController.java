@@ -1,8 +1,11 @@
 package com.github.jackieonway.activiti.controller.activiti.activiti;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.jackieonway.activiti.entity.request.WorkFlowRequest;
+import com.github.jackieonway.activiti.handler.BusinessException;
 import com.github.jackieonway.activiti.utils.ResponseUtils;
 import com.github.jackieonway.activiti.utils.ResultMsg;
 import com.github.jackieonway.activiti.utils.page.PageResult;
@@ -22,6 +25,7 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @CrossOrigin
@@ -47,12 +52,16 @@ public class ActivitiModelController {
     @Autowired
     private RepositoryService repositoryService;
 
+    @Value("#{${activiti.tenants}}")
+    private Map<String, String> tenants;
+
     /**
      * 新建一个空模型
      */
-    @ApiOperation(value = "新建一个空模型")
+    @ApiOperation(value = "新建一个空模型",notes = "必传参数: tenant: 租户")
     @GetMapping("/create")
-    public void newModel(HttpServletResponse response) throws IOException {
+    public void newModel(HttpServletResponse response,String tenant) throws IOException {
+        checkTenantExists(tenant);
         //初始化一个空模型
         Model model = repositoryService.newModel();
         //设置一些默认信息
@@ -66,6 +75,7 @@ public class ActivitiModelController {
         modelNode.put(ModelDataJsonConstants.MODEL_REVISION, revision);
         model.setName(name);
         model.setKey(key);
+        model.setTenantId(tenant);
         model.setMetaInfo(modelNode.toString());
         repositoryService.saveModel(model);
         String id = model.getId();
@@ -77,20 +87,21 @@ public class ActivitiModelController {
         stencilSetNode.put("namespace", "http://b3mn.org/stencilset/bpmn2.0#");
         editorNode.set("stencilset", stencilSetNode);
         repositoryService.addModelEditorSource(id, editorNode.toString().getBytes(StandardCharsets.UTF_8));
-        response.sendRedirect("/modeler.html?modelId=" + id);
+        response.sendRedirect("/modeler.html?modelId=" + id + "&tenant=" + tenant);
     }
 
     /**
      * 获取所有模型
      */
-    @ApiOperation(value = "获取所有模型", notes = "必传参数: queryConditionBean: 分页")
-    @GetMapping("/modelList")
+    @ApiOperation(value = "获取所有模型", notes = "必传参数: queryConditionBean: 分页,tenant: 租户")
+    @PostMapping("/modelList")
     @ResponseBody
-    public PageResult<Model> modelList(QueryConditionBean queryConditionBean) {
+    public PageResult<Model> modelList(@RequestBody WorkFlowRequest workFlowRequest) {
+        QueryConditionBean queryConditionBean = workFlowRequest.getQueryConditionBean();
         PageResult<Model> pageResult =
                 PageResult.newEmptyResult(queryConditionBean.getPageNum(), queryConditionBean.getPageSize());
-        List<Model> models = repositoryService.createModelQuery().listPage(queryConditionBean.getStartIndex(),
-                queryConditionBean.getPageSize());
+        List<Model> models = repositoryService.createModelQuery().modelTenantId(workFlowRequest.getTenant())
+                .listPage(queryConditionBean.getStartIndex(), queryConditionBean.getPageSize());
         if (CollectionUtils.isEmpty(models)) {
             return pageResult;
         }
@@ -103,13 +114,16 @@ public class ActivitiModelController {
      * 根据模型id发布模型为流程定义
      * http://localhost:8080/deploy?modelId=1
      */
-    @ApiOperation(value = "根据模型id发布模型为流程定义", notes = "必传参数: modelId: 模型id")
+    @ApiOperation(value = "根据模型id发布模型为流程定义", notes = "必传参数: modelId: 模型id, tenant: 租户")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "modelId", paramType = "query", value = "模型id", required = true, dataType =
+                    "String"),
+            @ApiImplicitParam(name = "tenant", paramType = "query", value = "租户", required = true, dataType =
                     "String")})
     @GetMapping("/deploy")
     @ResponseBody
-    public ResultMsg deploy(String modelId) throws IOException {
+    public ResultMsg deploy(String modelId,String tenant) throws IOException {
+        checkTenantExists(tenant);
         Model modelData = repositoryService.getModel(modelId);
         byte[] bytes = repositoryService.getModelEditorSource(modelData.getId());
         byte[] pngBytes = repositoryService.getModelEditorSourceExtra(modelData.getId());
@@ -129,15 +143,17 @@ public class ActivitiModelController {
                 .name(modelData.getName())
                 .addInputStream(processName, new ByteArrayInputStream(bpmnBytes))
                 .addInputStream(processPngName, new ByteArrayInputStream(pngBytes))
+                .tenantId(tenant)
                 .deploy();
         modelData.setDeploymentId(deployment.getId());
         repositoryService.saveModel(modelData);
         return ResponseUtils.success();
     }
 
-    @ApiOperation(value = "导入流程文件", notes = "必传参数: file: 流程定义文件 支持： bpmn20.xml 和 bpmn文件格式")
+    @ApiOperation(value = "导入流程文件", notes = "必传参数: file: 流程定义文件 支持： bpmn20.xml 和 bpmn文件格式, tenant: 租户")
     @PostMapping(value = "/importBpmn")
-    public void importBpmn(@RequestParam("file") MultipartFile uploadfile) {
+    public void importBpmn(@RequestParam("file") MultipartFile uploadfile, String tenant) {
+        checkTenantExists(tenant);
         InputStreamReader in = null;
         try {
             String fileName = uploadfile.getOriginalFilename();
@@ -172,6 +188,7 @@ public class ActivitiModelController {
             modelObjectNode.put(ModelDataJsonConstants.MODEL_REVISION, 1);
             modelData.setMetaInfo(modelObjectNode.toString());
             modelData.setName(processName);
+            modelData.setTenantId(tenant);
             repositoryService.saveModel(modelData);
             BpmnJsonConverter jsonConverter = new BpmnJsonConverter();
             ObjectNode editorNode = jsonConverter.convertToJson(bpmnModel);
@@ -190,4 +207,10 @@ public class ActivitiModelController {
         }
     }
 
+    private void checkTenantExists(String tenant) {
+        if (!tenants.containsKey(tenant)) {
+            log.info("租户[{}]不存在于[{}]", tenant, JSON.toJSONString(tenants));
+            throw new BusinessException("非法操作");
+        }
+    }
 }

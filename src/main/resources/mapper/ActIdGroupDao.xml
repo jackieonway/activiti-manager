@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.jackieonway.activiti.dao.ActIdGroupDao">
+  <resultMap id="BaseResultMap" type="com.github.jackieonway.activiti.entity.ActIdGroup">
+    <id column="ID_" jdbcType="VARCHAR" property="id" />
+    <result column="REV_" jdbcType="INTEGER" property="rev" />
+    <result column="NAME_" jdbcType="VARCHAR" property="name" />
+    <result column="TYPE_" jdbcType="VARCHAR" property="type" />
+    <result column="TENANT_ID" jdbcType="VARCHAR" property="tenantId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID_, REV_, NAME_, TYPE_, TENANT_ID
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from act_id_group
+    where ID_ = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from act_id_group
+    where ID_ = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" keyColumn="ID_" keyProperty="id" parameterType="com.github.jackieonway.activiti.entity.ActIdGroup" useGeneratedKeys="true">
+    insert into act_id_group (REV_, NAME_, TYPE_, 
+      TENANT_ID)
+    values (#{rev,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, 
+      #{tenantId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID_" keyProperty="id" parameterType="com.github.jackieonway.activiti.entity.ActIdGroup" useGeneratedKeys="true">
+    insert into act_id_group
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="rev != null">
+        REV_,
+      </if>
+      <if test="name != null">
+        NAME_,
+      </if>
+      <if test="type != null">
+        TYPE_,
+      </if>
+      <if test="tenantId != null">
+        TENANT_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="rev != null">
+        #{rev,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="tenantId != null">
+        #{tenantId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.github.jackieonway.activiti.entity.ActIdGroup">
+    update act_id_group
+    <set>
+      <if test="rev != null">
+        REV_ = #{rev,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        NAME_ = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        TYPE_ = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="tenantId != null">
+        TENANT_ID = #{tenantId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID_ = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.github.jackieonway.activiti.entity.ActIdGroup">
+    update act_id_group
+    set REV_ = #{rev,jdbcType=INTEGER},
+      NAME_ = #{name,jdbcType=VARCHAR},
+      TYPE_ = #{type,jdbcType=VARCHAR},
+      TENANT_ID = #{tenantId,jdbcType=VARCHAR}
+    where ID_ = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

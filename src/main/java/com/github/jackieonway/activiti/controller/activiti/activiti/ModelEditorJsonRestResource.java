@@ -48,32 +48,33 @@ public class ModelEditorJsonRestResource implements ModelDataJsonConstants {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @GetMapping(value = "/model/{modelId}/json", produces = "application/json")
-    @ApiOperation(value = "根据模型id获取流程模型数据", notes = "必传参数: modelId: 模型id")
+    @GetMapping(value = "/model/{tenant}/{modelId}/json", produces = "application/json")
+    @ApiOperation(value = "根据模型id获取流程模型数据", notes = "必传参数: modelId: 模型id, tennat")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "modelId", paramType = "query", value = "模型id", required = true, dataType = "String")})
-    public ObjectNode getEditorJson(@PathVariable String modelId) {
+            @ApiImplicitParam(name = "modelId", paramType = "query", value = "模型id", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "tenant", paramType = "query", value = "租户", required = true, dataType = "String")
+    })
+    public ObjectNode getEditorJson(@PathVariable String tenant, @PathVariable String modelId) {
         ObjectNode modelNode = null;
-
-        Model model = repositoryService.getModel(modelId);
-
-        if (model != null) {
-            try {
-                if (StringUtils.isNotEmpty(model.getMetaInfo())) {
-                    modelNode = (ObjectNode) objectMapper.readTree(model.getMetaInfo());
-                } else {
-                    modelNode = objectMapper.createObjectNode();
-                    modelNode.put(MODEL_NAME, model.getName());
-                }
-                modelNode.put(MODEL_ID, model.getId());
-                ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(
-                        new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
-                modelNode.set("model", editorJsonNode);
-
-            } catch (IOException e) {
-                LOGGER.error("Error creating model JSON", e);
-                throw new ActivitiException("Error creating model JSON", e);
+        Model model = repositoryService.createModelQuery().modelId(modelId).modelTenantId(tenant).singleResult();
+        if (model == null) {
+            return modelNode;
+        }
+        try {
+            if (StringUtils.isNotEmpty(model.getMetaInfo())) {
+                modelNode = (ObjectNode) objectMapper.readTree(model.getMetaInfo());
+            } else {
+                modelNode = objectMapper.createObjectNode();
+                modelNode.put(MODEL_NAME, model.getName());
             }
+            modelNode.put(MODEL_ID, model.getId());
+            ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(
+                    new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
+            modelNode.set("model", editorJsonNode);
+
+        } catch (IOException e) {
+            LOGGER.error("Error creating model JSON", e);
+            throw new ActivitiException("Error creating model JSON", e);
         }
         return modelNode;
     }

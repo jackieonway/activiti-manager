@@ -7,6 +7,7 @@ package com.github.jackieonway.activiti.controller.system;
 import com.github.jackieonway.activiti.ActivitiApplication;
 import com.github.jackieonway.activiti.utils.ResponseUtils;
 import com.github.jackieonway.activiti.utils.ResultMsg;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.OriginTrackedMapPropertySource;
 import org.springframework.boot.origin.OriginTrackedValue;
@@ -15,8 +16,10 @@ import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -27,9 +30,20 @@ import java.util.concurrent.TimeUnit;
  * @author Jackie
  * @version $id: SystemController.java v 0.1 2020-05-20 8:52 Jackie Exp $$
  */
+@Slf4j
 @RestController
 @RequestMapping("/system")
 public class SystemController {
+
+
+    private static final Map<String,String> cmds  = new HashMap<>();
+
+    static {
+        cmds.put("package", "mvn clean package -DskipTests");
+        cmds.put("killCmd", "start wmic process where name=%27cmd.exe%27 call terminate");
+        cmds.put("copy", "start copy /y target\\activiti-manager-1.0.0-SNAPSHOT.jar " +
+                "D:\\html\\activiti-manager-1.0.0-SNAPSHOT.jar");
+    }
 
     @PostMapping("/refreshConfig")
     public ResultMsg refreshConfig(@RequestBody Map<String,Object> params){
@@ -126,5 +140,38 @@ public class SystemController {
             }
         }
         return ResponseUtils.success(sources);
+    }
+
+    @GetMapping(value = "/execCmd")
+    public ResultMsg execCmd(String cmd) throws IOException {
+        log.info("params: [{}]", cmd);
+        String comand = cmds.get(cmd);
+        if (StringUtils.isEmpty(comand)){
+            return ResponseUtils.fail();
+        }
+        String osName = System.getProperty("os.name").toLowerCase();
+        Runtime runtime = Runtime.getRuntime();
+        if (osName.contains("windows")){
+            if ("package".equalsIgnoreCase(comand)) {
+                runtime.exec("cmd.exe /C cd /d D:\\Code\\github\\activiti-manager && " + cmds.get(comand));
+            }else if ("killCmd".equalsIgnoreCase(comand)) {
+                runtime.exec("cmd.exe /C " + cmds.get(comand));
+            }else if ("copy".equalsIgnoreCase(comand)) {
+                runtime.exec("cmd.exe /C " + cmds.get(comand));
+            }
+        }else if (osName.contains("linux")){
+            runtime.exec("sh -C pwd -> pwd.txt");
+        }
+        return ResponseUtils.success();
+    }
+
+
+    public static void killProcess() {
+        Runtime rt = Runtime.getRuntime();
+        try {
+            rt.exec("cmd.exe /C start wmic process where name='cmd.exe' call terminate");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -299,9 +299,9 @@ public class ActWorkFlowServiceImpl implements ActWorkFlowService {
         if (StringUtils.isNotBlank(workFlowRequest.getUserUuid())) {
             taskQuery.taskAssigneeLike(concatLike(workFlowRequest.getUserUuid()));
         }
-//        if (!CollectionUtils.isEmpty(workFlowRequest.getCandidateGroups())) {
-//            taskQuery.taskCandidateGroupIn(workFlowRequest.getCandidateGroups());
-//        }
+        if (!CollectionUtils.isEmpty(workFlowRequest.getCandidateGroups())) {
+            taskQuery.taskCandidateGroupIn(workFlowRequest.getCandidateGroups());
+        }
         taskQuery.taskTenantId(workFlowRequest.getTenant());
         if (StringUtils.isNotBlank(workFlowRequest.getBusinessKey())) {
             taskQuery.processInstanceBusinessKeyLike(concatLike(workFlowRequest.getBusinessKey()));
@@ -616,12 +616,14 @@ public class ActWorkFlowServiceImpl implements ActWorkFlowService {
     }
 
     private Task getTask(String getBusinessKey, String tenant) {
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+        List<ProcessInstance> list = runtimeService.createProcessInstanceQuery()
                 .processInstanceBusinessKey(getBusinessKey).processInstanceTenantId(tenant)
-                .singleResult();
-        if (Objects.isNull(processInstance)) {
+                .orderByProcessInstanceId().desc()
+                .list();
+        if (CollectionUtils.isEmpty(list)) {
             throw new ServiceException("当前业务不存在或审批完成");
         }
+        ProcessInstance processInstance = list.get(0);
         TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(processInstance.getId());
         return taskQuery.singleResult();
     }

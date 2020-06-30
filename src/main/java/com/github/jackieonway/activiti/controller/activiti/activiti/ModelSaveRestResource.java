@@ -12,17 +12,13 @@
  */
 package com.github.jackieonway.activiti.controller.activiti.activiti;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.constants.ModelDataJsonConstants;
-import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.Model;
@@ -48,33 +44,40 @@ import java.nio.charset.StandardCharsets;
 @RequestMapping("/service")
 @Api(value = "工作流模型保存接口", tags = "工作流模型保存接口")
 public class ModelSaveRestResource implements ModelDataJsonConstants {
-    private Logger LOGGER = LoggerFactory.getLogger(ModelSaveRestResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelSaveRestResource.class);
 
     @Autowired
     private RepositoryService repositoryService;
 
-    @Value("${activiti.root.path}")
-    private String rootPath;
+//    @Value("${activiti.root.path}")
+//    private String rootPath;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    @ApiOperation(value = "保存模型", notes = "必传参数: modelId: 模型id, json_xml: 流程XML的JSON形式数据, " +
+    @ApiOperation(value = "保存模型", notes = "必传参数: tenant: 租户, modelId: 模型id, json_xml: 流程XML的JSON形式数据, " +
             "svg_xml:流程XML的SVG形式数据, description: 工作流模型描述, name： 工作流模型名称")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "modelId", paramType = "query", value = "模型id", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "json_xml", paramType = "query", value = "流程XML的JSON形式数据", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "svg_xml", paramType = "query", value = "流程XML的SVG形式数据", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "description", paramType = "query", value = "工作流模型描述", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "name", paramType = "query", value = "工作流模型名称", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "tenent", paramType = "query", value = "租户", required = true, dataType =
+                    "String"),
+            @ApiImplicitParam(name = "modelId", paramType = "query", value = "模型id", required = true, dataType =
+                    "String"),
+            @ApiImplicitParam(name = "json_xml", paramType = "query", value = "流程XML的JSON形式数据", required = true,
+                    dataType = "String"),
+            @ApiImplicitParam(name = "svg_xml", paramType = "query", value = "流程XML的SVG形式数据", required = true,
+                    dataType = "String"),
+            @ApiImplicitParam(name = "description", paramType = "query", value = "工作流模型描述", required = true,
+                    dataType = "String"),
+            @ApiImplicitParam(name = "name", paramType = "query", value = "工作流模型名称", required = true, dataType =
+                    "String"),
     })
-    @PutMapping(value = "/model/{modelId}/save")
+    @PutMapping(value = "/model/{tenant}/{modelId}/save")
     @ResponseStatus(value = HttpStatus.OK)
-    public void saveModel(@PathVariable String modelId, @RequestParam("name") String name,
+    public void saveModel(@PathVariable String tenant, @PathVariable String modelId, @RequestParam("name") String name,
                           @RequestParam("json_xml") String jsonXml, @RequestParam("svg_xml") String svgXml,
                           @RequestParam("description") String description) {
         try {
-            Model model = repositoryService.getModel(modelId);
+            Model model = repositoryService.createModelQuery().modelId(modelId).modelTenantId(tenant).singleResult();
             ObjectNode modelJson = (ObjectNode) objectMapper.readTree(model.getMetaInfo());
             modelJson.put(MODEL_NAME, name);
             modelJson.put(MODEL_DESCRIPTION, description);
@@ -95,10 +98,10 @@ public class ModelSaveRestResource implements ModelDataJsonConstants {
 //            BpmnModel bpmnModel = jsonConverter.convertToBpmnModel(jsonNode);
 //            byte[] bpmnBytes = new BpmnXMLConverter().convertToXML(bpmnModel);
             //写入流程图xml
-//            transToFile(rootPath, "//xml//", name, ".bpmn20.xml", bpmnBytes);
+//            transToFile(rootPath + "//" + tennet, "//xml//", name, ".bpmn20.xml", bpmnBytes);
             final byte[] result = outStream.toByteArray();
             // 写入流程图图片
-//            transToFile(rootPath, "//pic//", name, ".png", result);
+//            transToFile(rootPath + "//" + tennet, "//pic//", name, ".png", result);
             repositoryService.addModelEditorSourceExtra(model.getId(), result);
             outStream.close();
         } catch (IOException | TranscoderException e) {
