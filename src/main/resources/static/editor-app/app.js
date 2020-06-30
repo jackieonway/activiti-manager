@@ -98,9 +98,9 @@ activitiModeler
              */
 
             /* Helper method to fetch model from server (always needed) */
-            function fetchModel(modelId) {
+            function fetchModel(modelId, tenant) {
 
-                var modelUrl = KISBPM.URL.getModel(modelId);
+                var modelUrl = KISBPM.URL.getTenantModel(modelId, tenant);
 
                 $http({method: 'GET', url: modelUrl}).success(function (data, status, headers, config) {
                     $rootScope.editor = new ORYX.Editor(data);
@@ -183,7 +183,8 @@ activitiModeler
                     ORYX._loadPlugins();
 
                     var modelId = EDITOR.UTIL.getParameterByName('modelId');
-                    fetchModel(modelId);
+                    var tenant = EDITOR.UTIL.getParameterByName('tenant');
+                    fetchModel(modelId, tenant);
 
                     $rootScope.window = {};
                     var updateWindowSize = function () {

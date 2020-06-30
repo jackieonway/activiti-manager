@@ -24,11 +24,19 @@ KISBPM.URL = {
         return ACTIVITI.CONFIG.contextRoot + '/model/' + modelId + '/json';
     },
 
+    getTenantModel: function (modelId, tenant) {
+        return ACTIVITI.CONFIG.contextRoot + '/model/' + tenant + '/'+ modelId + '/json';
+    },
+
     getStencilSet: function () {
         return ACTIVITI.CONFIG.contextRoot + '/editor/stencilset?version=' + Date.now();
     },
 
     putModel: function (modelId) {
         return ACTIVITI.CONFIG.contextRoot + '/model/' + modelId + '/save';
+    },
+
+    putTenantModel: function (modelId, tenant) {
+        return ACTIVITI.CONFIG.contextRoot + '/model/' + tenant + '/'+ modelId + '/save';
     }
 };

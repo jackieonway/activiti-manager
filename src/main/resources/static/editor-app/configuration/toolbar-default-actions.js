@@ -296,9 +296,17 @@ KISBPM.TOOLBAR = {
 /** Custom controller for the save dialog */
 var SaveModelCtrl = ['$rootScope', '$scope', '$http', '$route', '$location',
     function ($rootScope, $scope, $http, $route, $location) {
-
+        var tenant = "";
         var modelMetaData = $scope.editor.getModelMetaData();
-
+        var searchStr = window.location.search;
+        searchStr = searchStr.substr(1);
+        var strings = searchStr.split("&");
+        for (var i = 0; i < strings.length; i++) {
+            if (strings[i].search("tenant") > -1) {
+                var split = strings[i].split("=");
+                tenant =split[1];
+            }
+        }
         var description = '';
         if (modelMetaData.description) {
             description = modelMetaData.description;
@@ -397,7 +405,7 @@ var SaveModelCtrl = ['$rootScope', '$scope', '$http', '$route', '$location',
                     }
                     return str.join("&");
                 },
-                url: KISBPM.URL.putModel(modelMetaData.modelId)
+                url: KISBPM.URL.putTenantModel(modelMetaData.modelId, tenant)
             })
 
                 .success(function (data, status, headers, config) {
@@ -409,12 +417,12 @@ var SaveModelCtrl = ['$rootScope', '$scope', '$http', '$route', '$location',
 
                     $scope.status.loading = false;
                     $scope.$hide();
-
                     // Fire event to all who is listening
                     var saveEvent = {
                         type: KISBPM.eventBus.EVENT_TYPE_MODEL_SAVED,
                         model: params,
                         modelId: modelMetaData.modelId,
+                        tenant: tenant,
                         eventType: 'update-model'
                     };
                     KISBPM.eventBus.dispatch(KISBPM.eventBus.EVENT_TYPE_MODEL_SAVED, saveEvent);
